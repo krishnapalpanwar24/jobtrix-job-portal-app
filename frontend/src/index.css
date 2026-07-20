@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  /* Backgrounds - light, airy */
+  --color-base: #f6f7fb;
+  --color-surface: #ffffff;
+  --color-surface-alt: #eef1f6;
+  --color-border: #e3e7ee;
+
+  /* Text */
+  --color-text: #12151c;
+  --color-text-muted: #5b6472;
+  --color-text-faint: #8a93a3;
+
+  /* Accent - confident blue */
+  --color-accent: #2f5fe0;
+  --color-accent-strong: #1d46c4;
+  --color-accent-dim: #eaf0fe;
+
+  /* Status */
+  --color-success: #1e8e5a;
+  --color-danger: #d64545;
+  --color-warning: #c98a2b;
+
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-base);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Inputs/textareas/selects get their own subtle focus treatment via Tailwind
+   classes (border/ring) instead of the default blue browser outline. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
