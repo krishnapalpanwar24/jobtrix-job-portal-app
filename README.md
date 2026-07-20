@@ -2,7 +2,7 @@
 
 A MERN-stack job portal with three roles — Candidate, Employer, and Admin. Built with Node.js/Express/MongoDB on the backend and React/Vite/Tailwind on the frontend, with ImageKit for file storage and httpOnly-cookie based JWT auth.
 
-# 🔗 [Live Demo](https://jobtrix-job-portal-app.vercel.app/)
+# 🔗 [Jobtrix App](https://jobtrix-job-portal-app.vercel.app/)
 
 > Note: Backend is hosted on Render's free tier — first request after inactivity may take 30-50 seconds to load (cold start).
 
