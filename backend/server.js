@@ -26,6 +26,7 @@ const adminRoute = require("./routes/adminRoutes");
 const jobRoute = require("./routes/jobRoutes");
 const applicationRoute = require("./routes/applicationRoutes");
 const contactRoute = require("./routes/contactRoutes");
+const resumeAnalyzerRoutes = require("./routes/resumeAnalyzerRoutes");
 
 app.use("/api/user", userRoute);
 app.use("/api/employer", employerRoute);
@@ -33,6 +34,7 @@ app.use("/api/admin", adminRoute);
 app.use("/api/job", jobRoute);
 app.use("/api/application", applicationRoute);
 app.use("/api/contact", contactRoute);
+app.use("/api/resume", resumeAnalyzerRoutes);
 
 app.get("/", (req, res) => {
   res.send("Jobtrix API is running");

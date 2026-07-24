@@ -23,6 +23,10 @@ const EmployerDashboard = () => {
   const [applicants, setApplicants] = useState(null); // { jobId, list }
   const [editingJobId, setEditingJobId] = useState(null);
 
+  // 🤖 AI Resume Analyzer state
+  const [analyzing, setAnalyzing] = useState(null); // holds the app._id currently being analyzed
+  const [analysisResults, setAnalysisResults] = useState({}); // { [appId]: result }
+
   const loadJobs = async () => {
     const res = await api.get("/job/employer/my-jobs");
     setJobs(res.data.data);
@@ -85,11 +89,32 @@ const EmployerDashboard = () => {
   const viewApplicants = async (jobId) => {
     const res = await api.get(`/application/job/${jobId}`);
     setApplicants({ jobId, list: res.data.data });
+    setAnalysisResults({}); // reset previous results when switching jobs
   };
 
   const updateStatus = async (appId, newStatus) => {
     await api.put(`/application/${appId}/status`, { status: newStatus });
     viewApplicants(applicants.jobId);
+  };
+
+  // 🤖 Analyze a candidate's resume against the job description using AI
+  const analyzeResume = async (app, jobId) => {
+    if (!app.resume?.url) {
+      alert("This candidate hasn't uploaded a resume.");
+      return;
+    }
+    setAnalyzing(app._id);
+    try {
+      const res = await api.post("/resume/analyze", {
+        resumeUrl: app.resume.url,
+        jobId: jobId,
+      });
+      setAnalysisResults((prev) => ({ ...prev, [app._id]: res.data.data }));
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to analyze resume");
+    } finally {
+      setAnalyzing(null);
+    }
   };
 
   return (
@@ -187,12 +212,29 @@ const EmployerDashboard = () => {
                         <p className="truncate text-xs text-text-muted">{app.candidate?.email}</p>
                       </div>
                     </div>
-                    {app.resume?.url && (
-                      <a href={app.resume.url} target="_blank" rel="noreferrer" className="shrink-0 text-xs text-accent hover:text-accent-strong">
-                        View resume →
-                      </a>
-                    )}
+
+                    {/* 🤖 Resume link + AI Analyze button */}
+                    <div className="flex shrink-0 items-center gap-2">
+                      {app.resume?.url && (
+                        <a
+                          href={app.resume.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-accent hover:text-accent-strong"
+                        >
+                          View resume →
+                        </a>
+                      )}
+                      <button
+                        onClick={() => analyzeResume(app, applicants.jobId)}
+                        disabled={analyzing === app._id}
+                        className="rounded-full border border-border px-3 py-1.5 text-xs text-text-muted hover:border-accent-dim hover:text-accent disabled:opacity-50"
+                      >
+                        {analyzing === app._id ? "Analyzing..." : "🤖 AI Analyze"}
+                      </button>
+                    </div>
                   </div>
+
                   <div className="mt-3 flex flex-wrap gap-2">
                     {["applied", "shortlisted", "rejected", "hired"].map((s) => (
                       <button
@@ -206,6 +248,28 @@ const EmployerDashboard = () => {
                       </button>
                     ))}
                   </div>
+
+                  {/* 🤖 AI Analysis Result */}
+                 {analysisResults[app._id] && (
+  <div className="mt-3 rounded-lg border border-accent-dim bg-surface-alt px-5 py-4 text-sm leading-relaxed">
+    <p className="font-semibold text-text">
+      ATS Score:{" "}
+      <span className="text-accent">{analysisResults[app._id].atsScore}/100</span>
+    </p>
+    <p className="mt-2 text-text-muted">
+      <span className="font-semibold text-text">Matched skills:</span>{" "}
+      {analysisResults[app._id].matchedSkills?.join(", ") || "None"}
+    </p>
+    <p className="mt-2 text-text-muted">
+      <span className="font-semibold text-text">Missing skills:</span>{" "}
+      {analysisResults[app._id].missingSkills?.join(", ") || "None"}
+    </p>
+    <p className="mt-2 text-text-muted">
+      <span className="font-semibold text-text">Recommendation:</span>{" "}
+      {analysisResults[app._id].recommendation}
+    </p>
+  </div>
+)}
                 </div>
               ))}
             </div>
